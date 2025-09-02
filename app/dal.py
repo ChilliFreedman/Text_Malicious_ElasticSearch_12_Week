@@ -45,10 +45,39 @@ class DAL:
             }
             actions.append(action)
 
-        # הרצת bulk
+
         success, _ = helpers.bulk(self.es, actions)
         print(f"{success} documents indexed successfully.")
 
+    def bulk_update(self, actions):
+        helpers.bulk(self.es, actions)
+        print(f"Bulk update applied to {len(actions)} documents")
+
+    def get_all_documents(self, size=10000):
+        res = self.es.search(
+            index=self.index_name,
+            query={"match_all": {}},
+            size=size
+        )
+        return res["hits"]["hits"]
+
+    def update_document(self, doc_id, new_field_name, new_field_value):
+        if self.es.exists(index=self.index_name, id=doc_id):
+            self.es.update(
+                index=self.index_name,
+                id=doc_id,
+                body={"doc": {new_field_name: new_field_value}}
+            )
+            print(f"Added field '{new_field_name}' to document {doc_id}")
+        else:
+            print(f"Document {doc_id} does not exist")
+
+    def delete_docs_by_query(self, query):
+        response = self.es.delete_by_query(
+            index=self.index_name,
+            body={"query": query}
+        )
+        return response.get('deleted', 0)
 
 if __name__ == "__main__":
     csv_to_df = CsvToDf(r"..\data\tweets_injected 3.csv")
@@ -56,5 +85,6 @@ if __name__ == "__main__":
     dal = DAL("tweets",df)
     dal.create_index()
     dal.convert_df_to_elastic()
+
 
 
