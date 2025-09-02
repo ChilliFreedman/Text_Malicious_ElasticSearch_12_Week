@@ -19,7 +19,7 @@ class DAL:
                                    "format": "yyyy-MM-dd HH:mm:ssXXX||EEE MMM dd HH:mm:ss Z yyyy"},
                     "Antisemitic": {"type": "integer"},
                     "text": {"type": "text"},
-                    "emotion": {"type": "integer"},
+                    "emotion": {"type": "keyword"},
                     "weepon_list": {"type": "text"}
 
                 }
